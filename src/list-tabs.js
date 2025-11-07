@@ -65,8 +65,8 @@ function run(args) {
           " ",
         )}`,
         identfier: tabId,
-        frequency: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[url].frequency : 0.0,
-        lastFocused: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[url].lastFocused : Number.MAX_VALUE,
+        frequency: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[tabId].frequency : 0.0,
+        lastFocused: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[tabId].lastFocused : Number.MAX_VALUE,
       };
     }
   }
