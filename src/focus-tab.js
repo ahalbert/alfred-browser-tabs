@@ -111,7 +111,7 @@ function updateTabsFile(browser, urlFocused, windowIndex, tabIndex) {
     for (let t = 0; t < savedTabs.length; t++ ) {
       let savedTabInfo = savedTabs[t].split("\t");
       tabsSeenBefore[savedTabInfo[0]] = {
-        "url": savedTabInfo[0],
+        "id": savedTabInfo[0],
         "timesFocused": Number(savedTabInfo[1]),
         "timesSeen": Number(savedTabInfo[2]),
         "lastFocused": Number(savedTabInfo[3])
@@ -131,47 +131,45 @@ function updateTabsFile(browser, urlFocused, windowIndex, tabIndex) {
    * Adds tabs that have not been seen before
   */
   let windowCount = browser.windows.length;
-  let chosenUrl = null;
+  let chosenId = null;
   let tabsTitle =
     $.getenv("browser") === "Safari"
       ? browser.windows.tabs.name()
       : browser.windows.tabs.title();
-  let tabsUrl = browser.windows.tabs.url();
-  let urls = browser.windows.tabs.url();
-  tabsUrls = [];
+  let tabIds = browser.windows.tabs.id();
+  let ids = [];
   for (let w = 0; w < windowCount; w++) {
     for (let t = 0; t < tabsTitle[w].length; t++) {
-      tabsUrls.push(tabsUrl[w][t] || "");
+      ids.push(tabIds[w][t] || "");
       if (w == windowIndex && t == tabIndex) {
-        chosenUrl = tabsUrl[w][t] || "";
+        chosenId = tabIds[w][t] || "";
       }
     }
   }
-  const uniqueUrls = [...new Set(tabsUrls)];
   let tabsInBrowser = {};
-  for (let u = 0; u < uniqueUrls.length; u++) {
-    let url = uniqueUrls[u];
-    tabsInBrowser[url] = tabsSeenBefore.hasOwnProperty(url) ?
+  for (let u = 0; u < ids.length; u++) {
+    let id = ids[u];
+    tabsInBrowser[id] = tabsSeenBefore.hasOwnProperty(id) ?
                           {
-                            "url": url,
-                            "timesFocused": tabsSeenBefore[url].timesFocused,
-                            "timesSeen": tabsSeenBefore[url].timesSeen + 1,
-                            "lastFocused": tabsSeenBefore[url].lastFocused
+                            "id": id,
+                            "timesFocused": tabsSeenBefore[id].timesFocused,
+                            "timesSeen": tabsSeenBefore[id].timesSeen + 1,
+                            "lastFocused": tabsSeenBefore[id].lastFocused
                           }
                           : 
                           {
-                            "url": url,
+                            "id": id,
                             "timesFocused": 0,
                             "timesSeen": 1,
                             "lastFocused": Number.MAX_VALUE
                           };
   }
 
-  if (tabsInBrowser.hasOwnProperty(chosenUrl)) {
-    tabsInBrowser[chosenUrl] = {
-                            "url": chosenUrl,
-                            "timesFocused": tabsInBrowser[chosenUrl].timesFocused + 1,
-                            "timesSeen": tabsInBrowser[chosenUrl].timesSeen,
+  if (tabsInBrowser.hasOwnProperty(chosenId)) {
+    tabsInBrowser[chosenId] = {
+                            "id": chosenId,
+                            "timesFocused": tabsInBrowser[chosenId].timesFocused + 1,
+                            "timesSeen": tabsInBrowser[chosenId].timesSeen,
                             "lastFocused": Date.now()
                           };
   }
@@ -179,7 +177,7 @@ function updateTabsFile(browser, urlFocused, windowIndex, tabIndex) {
   //Convert to csv
   let tsvList = []
   for (tab in tabsInBrowser) {
-    tsvList.push(`${tabsInBrowser[tab].url}\t${tabsInBrowser[tab].timesFocused}\t${tabsInBrowser[tab].timesSeen}\t${tabsInBrowser[tab].lastFocused}`);
+    tsvList.push(`${tabsInBrowser[tab].id}\t${tabsInBrowser[tab].timesFocused}\t${tabsInBrowser[tab].timesSeen}\t${tabsInBrowser[tab].lastFocused}`);
   }
   let tsv = tsvList.join("\n").toString();
 
