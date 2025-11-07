@@ -27,7 +27,7 @@ function run(args) {
     for (let t = 0; t < savedTabs.length; t++ ) {
       let savedTabInfo = savedTabs[t].split("\t");
       tabsSeenBefore[savedTabInfo[0]] = {
-        "url": savedTabInfo[0],
+        "id": savedTabInfo[0],
         "frequency": Number(savedTabInfo[1])/Number(savedTabInfo[2]),
         "lastFocused": Number(savedTabInfo[3])
       }
@@ -42,12 +42,14 @@ function run(args) {
       ? chrome.windows.tabs.name()
       : chrome.windows.tabs.title();
   let tabsUrl = chrome.windows.tabs.url();
+  let tabsId = chrome.windows.tabs.id();
   let tabsMap = {};
 
   for (let w = 0; w < windowCount; w++) {
     for (let t = 0; t < tabsTitle[w].length; t++) {
       let url = tabsUrl[w][t] || "";
       let matchUrl = url.replace(/(^\w+:|^)\/\//, "");
+      let tabId = tabsId[w][t];
       let title = tabsTitle[w][t] || matchUrl;
 
       tabsMap[url] = {
@@ -62,8 +64,9 @@ function run(args) {
           /[^\w]/g,
           " ",
         )}`,
-        frequency: tabsSeenBefore.hasOwnProperty(url) ? tabsSeenBefore[url].frequency : 0.0,
-        lastFocused: tabsSeenBefore.hasOwnProperty(url) ? tabsSeenBefore[url].lastFocused : Number.MAX_VALUE,
+        identfier: tabId,
+        frequency: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[tabId].frequency : 0.0,
+        lastFocused: tabsSeenBefore.hasOwnProperty(tabId) ? tabsSeenBefore[tabId].lastFocused : Number.MAX_VALUE,
       };
     }
   }
@@ -82,6 +85,7 @@ function run(args) {
   });
 
   for (const obj of items) {
+    delete obj.identfier;
     delete obj.frequency;
     delete obj.lastFocused;
   }
